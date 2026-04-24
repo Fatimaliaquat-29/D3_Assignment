@@ -107,7 +107,7 @@ function initCharts() {
 
     const topBarContainer = d3.select('#topbarchart').node();
     const tbRect = topBarContainer.getBoundingClientRect();
-    const tbMargin = {top: 20, right: 30, bottom: 50, left: 180};
+    const tbMargin = {top: 20, right: 30, bottom: 50, left: 260};
     
     topBarSvg = d3.select('#topbarchart').append('svg')
         .attr('width', '100%')
@@ -385,7 +385,7 @@ function updateTopBarchart() {
     const tbContainer = d3.select('#topbarchart').node();
     if (!tbContainer) return;
     const tbRect = tbContainer.getBoundingClientRect();
-    const width = (tbRect.width || 800) - 180 - 30; // left and right margin
+    const width = (tbRect.width || 800) - 260 - 30; // left and right margin
     const height = (tbRect.height || 400) - 20 - 50; // top and bottom margin
 
     let displayData = state.filterType === 'All' ? data : data.filter(d => d.type1 === state.filterType);
