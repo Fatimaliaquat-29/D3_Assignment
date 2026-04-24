@@ -107,7 +107,7 @@ function initCharts() {
 
     const topBarContainer = d3.select('#topbarchart').node();
     const tbRect = topBarContainer.getBoundingClientRect();
-    const tbMargin = {top: 20, right: 30, bottom: 40, left: 120};
+    const tbMargin = {top: 20, right: 30, bottom: 50, left: 180};
     
     topBarSvg = d3.select('#topbarchart').append('svg')
         .attr('width', '100%')
@@ -118,6 +118,11 @@ function initCharts() {
         
     topBarSvg.append('g').attr('class', 'x-axis').attr('transform', `translate(0,${(tbRect.height || 400) - tbMargin.top - tbMargin.bottom})`);
     topBarSvg.append('g').attr('class', 'y-axis');
+    
+    topBarSvg.append('text').attr('class', 'x-label')
+        .attr('x', ((tbRect.width || 800) - tbMargin.left - tbMargin.right) / 2)
+        .attr('y', (tbRect.height || 400) - tbMargin.top - tbMargin.bottom + 40)
+        .attr('text-anchor', 'middle').attr('fill', 'var(--text-muted)');
 }
 
 function setupEventListeners() {
@@ -380,8 +385,8 @@ function updateTopBarchart() {
     const tbContainer = d3.select('#topbarchart').node();
     if (!tbContainer) return;
     const tbRect = tbContainer.getBoundingClientRect();
-    const width = (tbRect.width || 800) - 150;
-    const height = (tbRect.height || 400) - 60;
+    const width = (tbRect.width || 800) - 180 - 30; // left and right margin
+    const height = (tbRect.height || 400) - 20 - 50; // top and bottom margin
 
     let displayData = state.filterType === 'All' ? data : data.filter(d => d.type1 === state.filterType);
     displayData = displayData.sort((a, b) => b[state.xVar] - a[state.xVar]).slice(0, 15);
@@ -391,6 +396,7 @@ function updateTopBarchart() {
 
     topBarSvg.select('.x-axis').transition().duration(500).call(d3.axisBottom(topBarX));
     topBarSvg.select('.y-axis').transition().duration(500).call(d3.axisLeft(topBarY));
+    topBarSvg.select('.x-label').text(d3.select('#x-axis-select').node().value);
 
     const bars = topBarSvg.selectAll('.top-bar')
         .data(displayData, d => d.id);
