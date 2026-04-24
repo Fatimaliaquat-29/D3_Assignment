@@ -56,7 +56,15 @@
             </div>
 
             <div class="control-group">
-                <label for="sort-select">Sort Bar Chart (Reconfigure):</label>
+                <label for="main-chart-select">Main Chart (Reconfigure):</label>
+                <select id="main-chart-select">
+                    <option value="scatter">Scatterplot</option>
+                    <option value="bar">Bar Chart (Top 50)</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="sort-select">Sort Type Chart:</label>
                 <select id="sort-select">
                     <option value="Count">By Count</option>
                     <option value="Alphabetical">Alphabetical</option>
@@ -69,21 +77,35 @@
             </div>
         </div>
 
-        <div class="charts-container">
-            <div class="chart-card glassmorphism">
-                <div class="chart-header">
-                    <h2>Pokemon Stats Comparison</h2>
-                    <span class="badge">Select / Elaborate</span>
+        <div class="charts-layout">
+            <div class="main-chart-area">
+                <div class="chart-card glassmorphism h-full">
+                    <div class="chart-header">
+                        <h2 id="main-chart-title">Pokemon Stats Comparison</h2>
+                    </div>
+                    <div id="scatterplot" class="svg-container"></div>
+                    <div id="topbarchart" class="svg-container hidden"></div>
                 </div>
-                <div id="scatterplot" class="svg-container"></div>
             </div>
 
-            <div class="chart-card glassmorphism">
-                <div class="chart-header">
-                    <h2>Pokemon Count by Primary Type</h2>
-                    <span class="badge">Connect</span>
+            <div class="side-panel">
+                <div class="chart-card glassmorphism">
+                    <div class="chart-header">
+                        <h2>Type Distribution</h2>
+                        <span class="badge">Connect / Filter</span>
+                    </div>
+                    <div id="barchart" class="svg-container small"></div>
                 </div>
-                <div id="barchart" class="svg-container"></div>
+
+                <div class="chart-card glassmorphism" id="detail-panel">
+                    <div class="chart-header">
+                        <h2 id="detail-title">Select a Pokemon</h2>
+                        <span class="badge">Elaborate</span>
+                    </div>
+                    <div id="detail-content" class="detail-content">
+                        <p class="placeholder-text">Click a Pokemon dot to see its detailed stats here.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -92,6 +114,6 @@
     <div id="tooltip" class="tooltip hidden"></div>
 
     <!-- Application Script -->
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
 </body>
 </html>

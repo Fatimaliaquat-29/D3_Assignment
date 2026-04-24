@@ -6,7 +6,8 @@ let state = {
     yVar: 'Defense',   // Encode interaction
     sortMode: 'Count', // Reconfigure interaction
     isAbstract: false, // Abstract interaction
-    selectedPokemon: null // Select interaction
+    selectedPokemon: null, // Select interaction
+    mainChartType: 'scatter'
 };
 
 const typeColors = {
@@ -20,8 +21,8 @@ const typeColors = {
 
 // DOM Elements
 const tooltip = d3.select('#tooltip');
-let scatterSvg, barSvg;
-let scatterX, scatterY, barX, barY;
+let scatterSvg, barSvg, topBarSvg;
+let scatterX, scatterY, barX, barY, topBarX, topBarY;
 
 // Initialize
 d3.csv('Pokemon_data.csv').then(raw => {
@@ -103,12 +104,42 @@ function initCharts() {
         
     barSvg.append('g').attr('class', 'x-axis').attr('transform', `translate(0,${barRect.height - bMargin.top - bMargin.bottom})`);
     barSvg.append('g').attr('class', 'y-axis');
+
+    // Top Bar chart setup
+    const topBarContainer = d3.select('#topbarchart').node();
+    const tbRect = topBarContainer.getBoundingClientRect();
+    const tbMargin = {top: 20, right: 30, bottom: 40, left: 120}; // Wide left margin for names
+    
+    topBarSvg = d3.select('#topbarchart').append('svg')
+        .attr('width', '100%')
+        .attr('height', '100%')
+        .attr('viewBox', `0 0 ${tbRect.width || 800} ${tbRect.height || 400}`)
+        .append('g')
+        .attr('transform', `translate(${tbMargin.left},${tbMargin.top})`);
+        
+    topBarSvg.append('g').attr('class', 'x-axis').attr('transform', `translate(0,${(tbRect.height || 400) - tbMargin.top - tbMargin.bottom})`);
+    topBarSvg.append('g').attr('class', 'y-axis');
 }
 
 function setupEventListeners() {
     d3.select('#type-filter').on('change', function() {
         state.filterType = this.value;
         updateAll(); // Filter interaction
+    });
+
+    d3.select('#main-chart-select').on('change', function() {
+        state.mainChartType = this.value;
+        if (state.mainChartType === 'bar') {
+            d3.select('#scatterplot').classed('hidden', true);
+            d3.select('#topbarchart').classed('hidden', false);
+            d3.select('#main-chart-title').text(`Top 50 by ${d3.select('#x-axis-select').node().value}`);
+            updateTopBarchart();
+        } else {
+            d3.select('#scatterplot').classed('hidden', false);
+            d3.select('#topbarchart').classed('hidden', true);
+            d3.select('#main-chart-title').text('Pokemon Stats Comparison');
+            updateScatterplot();
+        }
     });
 
     d3.select('#x-axis-select').on('change', function() {
@@ -123,6 +154,7 @@ function setupEventListeners() {
         if(this.value === 'Sp. Atk') state.yVar = 'spAtk';
         if(this.value === 'Sp. Def') state.yVar = 'spDef';
         updateScatterplot(); // Encode interaction
+        if(state.mainChartType === 'bar') updateTopBarchart();
     });
 
     d3.select('#sort-select').on('change', function() {
@@ -140,6 +172,7 @@ function setupEventListeners() {
 function updateAll() {
     updateScatterplot();
     updateBarchart();
+    if (state.mainChartType === 'bar') updateTopBarchart();
 }
 
 function updateScatterplot() {
@@ -208,6 +241,7 @@ function updateScatterplot() {
             if (state.isAbstract) return;
             state.selectedPokemon = d.id;
             updateScatterplot();
+            showDetailPanel(d); // Elaborate interaction
             event.stopPropagation();
         });
 
@@ -341,4 +375,90 @@ function showTooltip(event, d) {
 
 function hideTooltip() {
     tooltip.classed('hidden', true);
+}
+
+// Reconfigure Interaction: Main Bar Chart
+function updateTopBarchart() {
+    const tbContainer = d3.select('#topbarchart').node();
+    if (!tbContainer) return;
+    const tbRect = tbContainer.getBoundingClientRect();
+    const width = (tbRect.width || 800) - 150;
+    const height = (tbRect.height || 400) - 60;
+
+    let displayData = state.filterType === 'All' ? data : data.filter(d => d.type1 === state.filterType);
+    displayData = displayData.sort((a, b) => b[state.xVar] - a[state.xVar]).slice(0, 50); // Top 50
+
+    topBarX = d3.scaleLinear().domain([0, d3.max(displayData, d => d[state.xVar]) || 200]).range([0, width]);
+    topBarY = d3.scaleBand().domain(displayData.map(d => d.name)).range([0, height]).padding(0.2);
+
+    topBarSvg.select('.x-axis').transition().duration(500).call(d3.axisBottom(topBarX));
+    topBarSvg.select('.y-axis').transition().duration(500).call(d3.axisLeft(topBarY));
+
+    const bars = topBarSvg.selectAll('.top-bar')
+        .data(displayData, d => d.id);
+
+    bars.exit().transition().duration(300).attr('width', 0).remove();
+
+    const barsEnter = bars.enter().append('rect')
+        .attr('class', 'top-bar bar')
+        .attr('y', d => topBarY(d.name))
+        .attr('height', topBarY.bandwidth())
+        .attr('x', 0)
+        .attr('width', 0)
+        .attr('fill', d => typeColors[d.type1] || '#fff')
+        .on('click', function(event, d) {
+            state.selectedPokemon = d.id;
+            showDetailPanel(d);
+            updateTopBarchart();
+        });
+
+    bars.merge(barsEnter)
+        .transition().duration(750)
+        .attr('y', d => topBarY(d.name))
+        .attr('height', topBarY.bandwidth())
+        .attr('x', 0)
+        .attr('width', d => topBarX(d[state.xVar]))
+        .attr('opacity', d => (state.selectedPokemon === d.id ? 1 : 0.8));
+}
+
+// Elaborate Interaction: Detail Panel
+function showDetailPanel(d) {
+    if (state.isAbstract) return;
+    
+    d3.select('#detail-title').html(`
+        ${d.name}
+        <div class="detail-types" style="margin-top: 0.5rem;">
+            <span class="detail-type-badge" style="background-color: ${typeColors[d.type1] || '#fff'}; color: #000;">${d.type1}</span>
+            ${d.type2 ? `<span class="detail-type-badge" style="background-color: ${typeColors[d.type2] || '#fff'}; color: #000;">${d.type2}</span>` : ''}
+            ${d.legendary ? `<span class="detail-type-badge" style="background-color: #F59E0B; color: #fff;">Legendary</span>` : ''}
+        </div>
+    `);
+
+    const stats = [
+        { label: 'HP', val: d.hp, color: '#EF4444', max: 255 },
+        { label: 'Attack', val: d.attack, color: '#F97316', max: 190 },
+        { label: 'Defense', val: d.defense, color: '#3B82F6', max: 230 },
+        { label: 'Sp. Atk', val: d.spAtk, color: '#EC4899', max: 194 },
+        { label: 'Sp. Def', val: d.spDef, color: '#8B5CF6', max: 230 },
+        { label: 'Speed', val: d.speed, color: '#10B981', max: 180 }
+    ];
+
+    let contentHtml = `<div class="detail-stats" style="margin-bottom: 1rem;"><span class="stat-label">Total Base Stats: </span><span class="stat-val" style="font-size:1.2rem">${d.total}</span></div>`;
+    contentHtml += `<div class="detail-stats">`;
+    
+    stats.forEach(s => {
+        const pct = Math.min(100, (s.val / s.max) * 100);
+        contentHtml += `
+            <div class="stat-row-detail">
+                <span class="stat-label">${s.label}</span>
+                <div class="stat-bar-bg">
+                    <div class="stat-bar-fill" style="width: ${pct}%; background-color: ${s.color};"></div>
+                </div>
+                <span class="stat-val">${s.val}</span>
+            </div>
+        `;
+    });
+    contentHtml += `</div>`;
+    
+    d3.select('#detail-content').html(contentHtml);
 }

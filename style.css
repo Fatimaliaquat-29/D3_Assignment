@@ -135,16 +135,39 @@ select:focus {
     transform: translateY(-2px);
 }
 
-.charts-container {
+.charts-layout {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 2.5fr 1fr;
     gap: 1.5rem;
 }
 
 @media (max-width: 1024px) {
-    .charts-container {
+    .charts-layout {
         grid-template-columns: 1fr;
     }
+}
+
+.main-chart-area {
+    display: flex;
+    flex-direction: column;
+}
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.h-full {
+    height: 100%;
+}
+
+.svg-container.small {
+    min-height: 250px;
+}
+
+.hidden {
+    display: none !important;
 }
 
 .chart-card {
@@ -239,6 +262,63 @@ select:focus {
 
 .stat-val {
     font-weight: 600;
+}
+
+/* Detail Panel Styles */
+#detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+    min-height: 250px;
+}
+
+.placeholder-text {
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.detail-types {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.detail-type-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.detail-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-row-detail {
+    display: grid;
+    grid-template-columns: 60px 1fr 30px;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.85rem;
+}
+
+.stat-bar-bg {
+    background: rgba(255, 255, 255, 0.1);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
 }
 
 /* D3 Axes Styling */
