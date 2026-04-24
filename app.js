@@ -131,7 +131,7 @@ function setupEventListeners() {
         if (state.mainChartType === 'bar') {
             d3.select('#scatterplot').classed('hidden', true);
             d3.select('#topbarchart').classed('hidden', false);
-            d3.select('#main-chart-title').text(`Top 50 by ${d3.select('#x-axis-select').node().value}`);
+            d3.select('#main-chart-title').text(`Top 15 by ${d3.select('#x-axis-select').node().value}`);
             updateTopBarchart();
         } else {
             d3.select('#scatterplot').classed('hidden', false);
@@ -336,8 +336,8 @@ function updateBarchart() {
 }
 
 // Elaborate Interaction
-function showTooltip(event, d) {
-    if (state.isAbstract) {
+function showTooltip(event, d, forceIndividual = false) {
+    if (state.isAbstract && !forceIndividual) {
         tooltip.html(`
             <div class="tooltip-title">${d.type} Type</div>
             <div class="tooltip-stats">
@@ -384,7 +384,7 @@ function updateTopBarchart() {
     const height = (tbRect.height || 400) - 60;
 
     let displayData = state.filterType === 'All' ? data : data.filter(d => d.type1 === state.filterType);
-    displayData = displayData.sort((a, b) => b[state.xVar] - a[state.xVar]).slice(0, 50);
+    displayData = displayData.sort((a, b) => b[state.xVar] - a[state.xVar]).slice(0, 15);
 
     topBarX = d3.scaleLinear().domain([0, d3.max(displayData, d => d[state.xVar]) || 200]).range([0, width]);
     topBarY = d3.scaleBand().domain(displayData.map(d => d.name)).range([0, height]).padding(0.2);
@@ -404,7 +404,7 @@ function updateTopBarchart() {
         .attr('x', 0)
         .attr('width', 0)
         .attr('fill', d => typeColors[d.type1] || '#fff')
-        .on('mouseover', showTooltip)
+        .on('mouseover', (event, d) => showTooltip(event, d, true))
         .on('mouseout', hideTooltip);
 
     bars.merge(barsEnter)
