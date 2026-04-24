@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokemon Interactive Dashboard - Assignment 3</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="header">
+            <div class="header-content">
+                <h1>Pokemon Interactive Dashboard</h1>
+                <p>Exploring stats of over 800 Pokemon across all generations</p>
+            </div>
+        </header>
+
+        <div class="controls-panel glassmorphism">
+            <div class="control-group">
+                <label for="type-filter">Filter by Type (Filter):</label>
+                <select id="type-filter">
+                    <option value="All">All Types</option>
+                    <!-- Options populated via JS -->
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="x-axis-select">X-Axis (Encode):</label>
+                <select id="x-axis-select">
+                    <option value="Attack">Attack</option>
+                    <option value="Defense">Defense</option>
+                    <option value="HP">HP</option>
+                    <option value="Speed">Speed</option>
+                    <option value="Sp. Atk">Sp. Atk</option>
+                    <option value="Sp. Def">Sp. Def</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="y-axis-select">Y-Axis (Encode):</label>
+                <select id="y-axis-select">
+                    <option value="Defense" selected>Defense</option>
+                    <option value="Attack">Attack</option>
+                    <option value="HP">HP</option>
+                    <option value="Speed">Speed</option>
+                    <option value="Sp. Atk">Sp. Atk</option>
+                    <option value="Sp. Def">Sp. Def</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="sort-select">Sort Bar Chart (Reconfigure):</label>
+                <select id="sort-select">
+                    <option value="Count">By Count</option>
+                    <option value="Alphabetical">Alphabetical</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>View Mode (Abstract):</label>
+                <button id="toggle-view" class="btn">Show Aggregated View</button>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-card glassmorphism">
+                <div class="chart-header">
+                    <h2>Pokemon Stats Comparison</h2>
+                    <span class="badge">Select / Elaborate</span>
+                </div>
+                <div id="scatterplot" class="svg-container"></div>
+            </div>
+
+            <div class="chart-card glassmorphism">
+                <div class="chart-header">
+                    <h2>Pokemon Count by Primary Type</h2>
+                    <span class="badge">Connect</span>
+                </div>
+                <div id="barchart" class="svg-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tooltip (Elaborate) -->
+    <div id="tooltip" class="tooltip hidden"></div>
+
+    <!-- Application Script -->
+    <script src="app.js?v=3"></script>
+</body>
+</html>
