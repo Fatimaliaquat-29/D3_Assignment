@@ -2,8 +2,8 @@
 let data = [];
 let state = {
     filterType: 'All', // Filter interaction
-    xVar: 'Attack',    // Encode interaction
-    yVar: 'Defense',   // Encode interaction
+    xVar: 'attack',    // Encode interaction
+    yVar: 'defense',   // Encode interaction
     sortMode: 'Count', // Reconfigure interaction
     isAbstract: false, // Abstract interaction
     selectedPokemon: null, // Select interaction
