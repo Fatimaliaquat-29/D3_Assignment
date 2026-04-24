@@ -284,3 +284,12 @@ select:focus {
     filter: brightness(1.2);
 }
 .hidden { display: none !important; }
+
+/* Top Bar Chart */
+.top-bar {
+    cursor: pointer;
+    transition: opacity 0.2s, filter 0.2s;
+}
+.top-bar:hover { filter: brightness(1.25); }
+.bar-val { pointer-events: none; }
+.legendary-badge { color: #F59E0B; font-weight: 600; }
